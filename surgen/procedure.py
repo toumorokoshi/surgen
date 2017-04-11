@@ -1,4 +1,6 @@
 from .exceptions import ProcedureNotFound
+from clint.textui import puts
+
 
 class Procedure(object):
     """
@@ -16,12 +18,29 @@ class Procedure(object):
     def root(self):
         return self._target_dir
 
+    def should_not_run(self):
+        """
+        This should return None if the test should execute.
+        otherwise, it should provide a string indicating the
+        reason why it was skipped.
+        """
+        return None
+
+    def log(self, message):
+        """ log a message. """
+        puts(message)
+
+    def operate(self):
+        """
+        This method should be overriden, with the actual script.
+
+        In the case of an error, an exception should be raised.
+        """
+        print("foo")
+
     def __str__(self):
         return self._file_name
 
-    def operate(self):
-        """ this method should be overriden, with the actual script. """
-        print("foo")
 
 def from_file(full_file_path):
     """ load a procedure from a full file path. """

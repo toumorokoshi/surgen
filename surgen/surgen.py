@@ -25,23 +25,28 @@ class Surgen(object):
             for name, procedure_cls in self._procedures_by_name.items():
                 puts("{0}:".format(name))
                 with indent(2):
-                    puts(colored.yellow("executing...".format(name)))
                     result = self._run_procedure(name, procedure_cls, target_dir)
-                    if result:
-                        puts(colored.red("failed with code {0}".format(result)))
+                    if result > 0:
                         return result
-                    else:
-                        puts(colored.green("complete!"))
+                    elif result > -1:
                         successful_procedures += 1
-        puts(colored.green("Complete! {0} procedures performed.".format(successful_procedures)))
+        puts(colored.green("Complete! {0} procedure(s) performed.".format(successful_procedures)))
 
     def _run_procedure(self, name, procedure_cls, target_dir):
+        puts(colored.yellow("executing...".format(name)))
         procedure = procedure_cls(name, target_dir)
+        should_not_run_reason = procedure.should_not_run()
+        if should_not_run_reason:
+            puts(colored.yellow("skipping, should_not_run returned: {0}".format(should_not_run_reason)))
+            return 0
         try:
-            procedure.operate()
+            with indent(2):
+                result = procedure.operate()
         except Exception as e:
             LOG.debug("", exc_info=True)
             puts(colored.red("procedure raised an exception! {0}".format(e)))
+            return 1
+        puts(colored.green("complete!"))
 
 
 def surgen_from_directory(procedure_dir):

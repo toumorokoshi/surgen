@@ -32,11 +32,16 @@ directory and the current working directory, respectively.
 Surgen Script
 =============
 
-A surgen script should contain a class that:
+A surgen script MUST contain a class that:
 
     * extends surgen.Procedure
     * overrides operate(self)
     * does NOT override __init__
+
+A surgen script can:
+
+    * provide a should_run function to determine if the script should run (default true)
+
 
 Examples of surgen scripts can be found in the examples/ directory.
 

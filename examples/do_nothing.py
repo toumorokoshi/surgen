@@ -1,6 +1,8 @@
 from surgen import Procedure
 
+
 class DoNothing(Procedure):
 
     def operate(self):
-        print(self.root)
+        # using self.log ensures proper formatting.
+        self.log("hello world!")
