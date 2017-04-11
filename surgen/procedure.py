@@ -1,3 +1,5 @@
+from .exceptions import ProcedureNotFound
+
 class Procedure(object):
     """
     the procedure represents the base class that a procedure file
@@ -28,6 +30,13 @@ def from_file(full_file_path):
         g = {}
         l = {}
         exec(contents, g, l)
-        for name, value in g.items():
-            if isinstance(value, Procedure):
+        for name, value in l.items():
+            if (
+                isinstance(value, type) and
+                issubclass(value, Procedure) and
+                value is not Procedure
+            ):
                 return value
+        raise ProcedureNotFound("unable to find class that inherits surgen.Procedure in file {0}".format(
+            full_file_path
+        ))

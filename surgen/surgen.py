@@ -2,6 +2,7 @@ import os
 from collections import OrderedDict
 from clint.textui import colored, puts, indent
 from .procedure import from_file
+from .exceptions import ProcedureNotFound
 
 import logging
 
@@ -10,7 +11,7 @@ LOG = logging.getLogger(__name__)
 class Surgen(object):
     """ the main context to perform operations. """
 
-    def __init__(self, procedures_by_name)
+    def __init__(self, procedures_by_name):
         self._procedures_by_name = procedures_by_name
 
     def operate(self, target_dir):
@@ -18,22 +19,29 @@ class Surgen(object):
         perform the operation on the target directory.
         return an exit code.
         """
-        puts(colored.green("Perfoming procedures on {0}...".format(target_dir)))
-        with indent(4):
+        puts("Perfoming procedures on {0}".format(target_dir))
+        successful_procedures = 0
+        with indent(2):
             for name, procedure_cls in self._procedures_by_name.items():
-                puts(colored.yellow("perfoming procedure {0}...".format(name)))
-                result = self.operate(procedure, target_dir)
-                if result != 0:
-                    puts(colored.red("procedure failed with code {0}".format(result)))
-                    return result
+                puts("{0}:".format(name))
+                with indent(2):
+                    puts(colored.yellow("executing...".format(name)))
+                    result = self._run_procedure(name, procedure_cls, target_dir)
+                    if result:
+                        puts(colored.red("failed with code {0}".format(result)))
+                        return result
+                    else:
+                        puts(colored.green("complete!"))
+                        successful_procedures += 1
+        puts(colored.green("Complete! {0} procedures performed.".format(successful_procedures)))
 
-    def operate(self, name, procedure_cls, target_dir):
+    def _run_procedure(self, name, procedure_cls, target_dir):
         procedure = procedure_cls(name, target_dir)
         try:
             procedure.operate()
         except Exception as e:
             LOG.debug("", exc_info=True)
-            puts(colored.red("procedure raised an exception! {0}".format(e))
+            puts(colored.red("procedure raised an exception! {0}".format(e)))
 
 
 def surgen_from_directory(procedure_dir):
@@ -51,5 +59,9 @@ def _procedures_from_dir(procedure_dir):
             continue
         name = d[:-len(".py")]
         full_path = os.path.join(procedure_dir, d)
-        procedures_by_name[name] = from_file(d)
+        try:
+            procedures_by_name[name] = from_file(full_path)
+        except ProcedureNotFound as pnf:
+            puts(colored.yellow("skipping {0}: {1}".format(d, pnf)))
+            continue
     return procedures_by_name
