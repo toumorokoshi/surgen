@@ -14,6 +14,7 @@ README_PATH = os.path.join(base, "README.rst")
 
 install_requires = [
     'clint',
+    'docopt'
 ]
 
 tests_require = []
@@ -50,5 +51,10 @@ setup(name='surgen',
           'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5',
       ],
-      tests_require=tests_require
+      tests_require=tests_require,
+      entry_points={
+          'console_scripts': [
+              'surgen=surgen.main:main'
+          ],
+      },
 )
