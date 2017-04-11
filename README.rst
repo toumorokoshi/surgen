@@ -29,6 +29,16 @@ containing surgen scripts, and the directory to apply them to:
 Both arguments are optional, and default to the ./surgen-scripts
 directory and the current working directory, respectively.
 
+Surgen Script
+=============
+
+A surgen script should contain a class that:
+
+    * extends surgen.Procedure
+    * overrides operate(self)
+    * does NOT override __init__
+
+Examples of surgen scripts can be found in the examples/ directory.
 
 ----
 TODO
