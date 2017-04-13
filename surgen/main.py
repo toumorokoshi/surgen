@@ -1,11 +1,12 @@
 """surgen, a codebase upgrade tool
 
 Usage:
-  surgen [-i -v <procedure_dir> <target_dir>]
+  surgen [-d -i -v <procedure_dir> <target_dir>]
 
 Options:
   <procedure_dir>         the directory containing surgen procedure files [default: ./procedures/]
   <target_dir>            the directory to operate on. [default: .]
+  -d, --dry-run           skips execution if provided
   -i, --ignore-errors     continues if a procedure fails
   -v, --verbose           show verbose output
   -h, --help              show this usage guide
@@ -24,4 +25,4 @@ def main(argv=sys.argv[1:]):
     level = logging.DEBUG if options["--verbose"] else logging.INFO
     s = surgen_from_directory(options.get("<procedure_dir>") or DEFAULT_PROCEDURE_DIR)
     return s.operate(options.get("<target_dir>") or DEFAULT_TARGET_DIR,
-                     options["--ignore-errors"])
+                     options["--ignore-errors"], options["--dry-run"])

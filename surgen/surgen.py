@@ -20,7 +20,7 @@ class Surgen(object):
     def __init__(self, procedures_by_name):
         self._procedures_by_name = procedures_by_name
 
-    def operate(self, target_dir, ignore_errors):
+    def operate(self, target_dir, ignore_errors, dry_run):
         """
         perform the operation on the target directory.
         return an exit code.
@@ -31,7 +31,7 @@ class Surgen(object):
             for name, procedure_cls in self._procedures_by_name.items():
                 puts("{0}:".format(name))
                 with indent(2):
-                    result = self._run_procedure(name, procedure_cls, target_dir)
+                    result = self._run_procedure(name, procedure_cls, target_dir, dry_run)
                     results[result] += 1
                     if not ignore_errors and result == Result.FAIL:
                         with indent(-4):
@@ -45,21 +45,22 @@ class Surgen(object):
         puts(colored.green("Complete! {0} procedure(s) performed.".format(len(self._procedures_by_name))))
         puts(colored.green("{0} success, {1} failed, {2} skipped".format(*[results[r] for r in Result.__members__.values()])))
 
-    def _run_procedure(self, name, procedure_cls, target_dir):
+    def _run_procedure(self, name, procedure_cls, target_dir, dry_run):
         puts(colored.yellow("executing...".format(name)))
         procedure = procedure_cls(name, target_dir)
         should_not_run_reason = procedure.should_not_run()
         if should_not_run_reason:
             puts(colored.yellow("skipping, should_not_run returned: {0}".format(should_not_run_reason)))
             return Result.SKIP
-        try:
-            with indent(2):
-                result = procedure.operate()
-        except Exception as e:
-            LOG.debug("", exc_info=True)
-            puts(colored.red("procedure raised an exception! {0}".format(e)))
-            return Result.FAIL
-        puts(colored.green("complete!"))
+        if not dry_run:
+            try:
+                with indent(2):
+                    result = procedure.operate()
+            except Exception as e:
+                LOG.debug("", exc_info=True)
+                puts(colored.red("procedure raised an exception! {0}".format(e)))
+                return Result.FAIL
+            puts(colored.green("complete!"))
         return Result.PASS
 
 
