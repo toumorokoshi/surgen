@@ -2,5 +2,9 @@ class SurgenException(Exception):
     pass
 
 
-class ProcedureNotFound(Exception):
+class ProcedureNotFound(SurgenException):
+    pass
+
+
+class TargetDriverNotFound(SurgenException):
     pass

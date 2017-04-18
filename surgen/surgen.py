@@ -20,24 +20,26 @@ class Surgen(object):
     def __init__(self, procedures_by_name):
         self._procedures_by_name = procedures_by_name
 
-    def operate(self, target_dir, ignore_errors, dry_run):
+    def operate(self, target, ignore_errors, dry_run):
         """
         perform the operation on the target directory.
         return an exit code.
         """
-        puts("Perfoming procedures on {0}".format(target_dir))
+        puts("Perfoming procedures on {0}".format(target))
+        target.before_procedures()
         results = defaultdict(int)
         with indent(2):
             for name, procedure_cls in self._procedures_by_name.items():
                 puts("{0}:".format(name))
                 with indent(2):
-                    result = self._run_procedure(name, procedure_cls, target_dir, dry_run)
+                    result = self._run_procedure(name, procedure_cls, target.workspace, dry_run)
                     results[result] += 1
                     if not ignore_errors and result == Result.FAIL:
                         with indent(-4):
                             puts(colored.red("Surgen ending early"))
                             self._print_results(results)
                         return 1
+        target.after_procedures()
         self._print_results(results)
         return 1 if Result.FAIL in results else 0
 

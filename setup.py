@@ -14,7 +14,8 @@ README_PATH = os.path.join(base, "README.rst")
 
 install_requires = [
     'clint',
-    'docopt'
+    'docopt',
+    'gitpython',
 ]
 
 tests_require = []
