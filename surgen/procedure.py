@@ -46,16 +46,21 @@ def from_file(full_file_path):
     """ load a procedure from a full file path. """
     with open(full_file_path) as fh:
         contents = fh.read()
-        g = {}
-        l = {}
-        exec(contents, g, l)
-        for name, value in l.items():
-            if (
-                isinstance(value, type) and
-                issubclass(value, Procedure) and
-                value is not Procedure
-            ):
-                return value
-        raise ProcedureNotFound("unable to find class that inherits surgen.Procedure in file {0}".format(
-            full_file_path
-        ))
+        return from_string(contents, full_file_path)
+
+
+def from_string(string, file_name):
+    l = {}
+    l["__file__"] = file_name
+    bytecode = compile(string, file_name, "exec")
+    exec(bytecode, l, l)
+    for name, value in l.items():
+        if (
+            isinstance(value, type) and
+            issubclass(value, Procedure) and
+            value is not Procedure
+        ):
+            return value
+    raise ProcedureNotFound("unable to find class that inherits surgen.Procedure in file {0}".format(
+        file_name
+    ))
