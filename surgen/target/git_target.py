@@ -15,15 +15,21 @@ class GitTarget(TargetBase):
 
     def prepare(self):
         self._workspace = tempfile.mkdtemp()
+        self.log("cloning {0}...".format(self.workspace))
         self._repo = Repo.clone_from(self._target, self.workspace)
 
     def commit(self, summary):
         """
         summary: a summary of the action performed on the target.
         """
+        message = "updating repo programatically (via surgen): \n\n" + str(summary)
         self._repo.git.add(".")
-        self._repo.git.commit("-am", summary)
-        self._repo.git.push("origin", "master")
+        if self._repo.is_dirty():
+            self.log("committing changes to {0}".format(self._target))
+            self._repo.index.commit(message)
+            self._repo.git.push("origin", "master")
+        else:
+            self.log("no changes found. skipping commit...")
 
     def cleanup(self):
         shutil.rmtree(self._workspace)

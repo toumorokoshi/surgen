@@ -1,8 +1,14 @@
+from clint.textui import puts
+
+
 class TargetBase(object):
     TARGET_TYPE = "base"
 
     def __init__(self, target):
         self._target = target
+
+    def log(self, msg):
+        puts(msg)
 
     @property
     def workspace(self):
