@@ -9,10 +9,12 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+
 class Result(Enum):
     PASS = 0
     FAIL = 1
     SKIP = 2
+
 
 class Surgen(object):
     """ the main context to perform operations. """
@@ -26,22 +28,25 @@ class Surgen(object):
         return an exit code.
         """
         puts("Perfoming procedures on {0}".format(target))
-        target.before_procedures()
-        results = defaultdict(int)
-        with indent(2):
-            for name, procedure_cls in self._procedures_by_name.items():
-                puts("{0}:".format(name))
-                with indent(2):
-                    result = self._run_procedure(name, procedure_cls, target.workspace, dry_run)
-                    results[result] += 1
-                    if not ignore_errors and result == Result.FAIL:
-                        with indent(-4):
-                            puts(colored.red("Surgen ending early"))
-                            self._print_results(results)
-                        return 1
-        target.after_procedures()
-        self._print_results(results)
-        return 1 if Result.FAIL in results else 0
+        target.prepare()
+        try:
+            results = defaultdict(int)
+            with indent(2):
+                for name, procedure_cls in self._procedures_by_name.items():
+                    puts("{0}:".format(name))
+                    with indent(2):
+                        result = self._run_procedure(name, procedure_cls, target.workspace, dry_run)
+                        results[result] += 1
+                        if not ignore_errors and result == Result.FAIL:
+                            with indent(-4):
+                                puts(colored.red("Surgen ending early"))
+                                self._print_results(results)
+                            return 1
+            target.commit("foobar")
+            self._print_results(results)
+            return 1 if Result.FAIL in results else 0
+        finally:
+            target.cleanup()
 
     def _print_results(self, results):
         puts(colored.green("Complete! {0} procedure(s) performed.".format(len(self._procedures_by_name))))
@@ -69,6 +74,7 @@ class Surgen(object):
 def surgen_from_directory(procedure_dir):
     """ load a surgen object from a directory """
     return Surgen(_procedures_from_dir(procedure_dir))
+
 
 def _procedures_from_dir(procedure_dir):
     procedures_by_name = OrderedDict()

@@ -1,16 +1,20 @@
 class TargetBase(object):
+    TARGET_TYPE = "base"
+
     def __init__(self, target):
         self._target = target
 
     @property
     def workspace(self):
-        return self._target
+        raise NotImplementedError()
 
-    def before_procedures(self):
+    def prepare(self):
         pass
 
-    def after_procedures(self):
+    def commit(self, summary):
         pass
 
     def __str__(self):
-        pass
+        return "{0}: ({1})".format(
+            self.__class__.__name__, self._target
+        )
