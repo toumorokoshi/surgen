@@ -16,6 +16,8 @@ class Surgen(object):
 
     def __init__(self, procedures_by_name):
         self._procedures_by_name = procedures_by_name
+        # lists data about performed procedures
+        self._performed_procedure_data = []
 
     def operate(self, target, ignore_errors, dry_run):
         """
@@ -39,8 +41,12 @@ class Surgen(object):
                                 puts(colored.red("Surgen ending early"))
                                 self._print_results(results)
                             return 1
-            target.commit(results)
+            if not dry_run:
+                target.commit(results)
             self._print_results(results)
+            self._performed_procedure_data.append(
+                (target, results)
+            )
             return 1 if ResultStatus["FAIL"] in results else 0
         finally:
             target.cleanup()
@@ -66,6 +72,11 @@ class Surgen(object):
                 return ResultStatus["FAIL"]
             puts(colored.green("complete!"))
         return ResultStatus["PASS"]
+
+    def print_total_summary(self):
+        """ print the total summary. """
+        for target, results in self._performed_procedure_data:
+            puts(colored.green("{0}: {PASS} | {FAIL} | {SKIP}".format(target, **results.count_by_status)))
 
 
 def surgen_from_directory(procedure_dir):

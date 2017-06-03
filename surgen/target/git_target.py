@@ -23,13 +23,16 @@ class GitTarget(TargetBase):
         summary: a summary of the action performed on the target.
         """
         message = "updating repo programatically (via surgen): \n\n" + str(summary)
-        self._repo.git.add(".")
-        if self._repo.is_dirty():
-            self.log("committing changes to {0}".format(self._target))
-            self._repo.index.commit(message)
-            self._repo.git.push("origin", "master")
-        else:
-            self.log("no changes found. skipping commit...")
+        try:
+            self._repo.git.add(".")
+            if self._repo.is_dirty():
+                self.log("committing changes to {0}".format(self._target))
+                self._repo.index.commit(message)
+                self._repo.git.push()
+            else:
+                self.log("no changes found. skipping commit...")
+        except:
+            self.log("unable to push to {0}".format(self._target))
 
     def cleanup(self):
         shutil.rmtree(self._workspace)
