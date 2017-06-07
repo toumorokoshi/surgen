@@ -8,7 +8,7 @@ ResultStatus = {
 }
 
 
-@attr.s
+@attr.s(frozen=True)
 class Result(object):
     procedure = attr.ib()
     status = attr.ib()

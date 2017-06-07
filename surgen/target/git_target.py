@@ -1,7 +1,10 @@
+import logging
 import shutil
 import tempfile
 from .base import TargetBase
 from git import Repo
+
+LOG = logging.getLogger(__name__)
 
 
 class GitTarget(TargetBase):
@@ -31,7 +34,9 @@ class GitTarget(TargetBase):
                 self._repo.git.push()
             else:
                 self.log("no changes found. skipping commit...")
-        except:
+        except Exception as e:
+            LOG.exception("")
+            print(e)
             self.log("unable to push to {0}".format(self._target))
 
     def cleanup(self):
