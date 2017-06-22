@@ -1,7 +1,6 @@
 import os
 from collections import OrderedDict, defaultdict
 from clint.textui import colored, puts, indent
-from enum import Enum
 from .procedure import from_file
 from .exceptions import ProcedureNotFound
 from .result_set import ResultStatus, Result, ResultSet
