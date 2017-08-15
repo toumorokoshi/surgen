@@ -1,9 +1,9 @@
 import os
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from clint.textui import colored, puts, indent
 from .procedure import from_file
 from .exceptions import ProcedureNotFound
-from .result_set import ResultStatus, Result, ResultSet
+from .results import ResultStatus, Result, Results
 
 import logging
 
@@ -26,7 +26,7 @@ class Surgen(object):
         puts("Perfoming procedures on {0}".format(target))
         target.prepare()
         try:
-            results = ResultSet()
+            results = Results()
             with indent(2):
                 for name, procedure_cls in self._procedures_by_name.items():
                     puts("{0}:".format(name))

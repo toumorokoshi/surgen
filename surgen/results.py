@@ -1,5 +1,4 @@
 import attr
-from collections import defaultdict
 
 ResultStatus = {
     "PASS": "PASS",
@@ -19,11 +18,11 @@ class Result(object):
         )
 
 
-class ResultSet(set):
-    """ stores a set of result. """
+class Results(list):
+    """ stores a list of results. """
 
     def __init__(self):
-        super(ResultSet, self).__init__()
+        super(Results, self).__init__()
         self._by_status = {}
         for r in ResultStatus.values():
             self._by_status[r] = 0
@@ -32,7 +31,7 @@ class ResultSet(set):
         return "\n".join(list(str(e) for e in self))
 
     def add(self, result):
-        super(ResultSet, self).add(result)
+        super(Results, self).append(result)
         self._by_status[result.status] += 1
 
     @property
