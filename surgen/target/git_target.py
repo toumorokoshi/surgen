@@ -5,12 +5,14 @@ from .base import TargetBase
 from git import Repo
 
 LOG = logging.getLogger(__name__)
-
+DEFAULT_MESSAGE = "updating repo programatically (via surgen)"
 
 class GitTarget(TargetBase):
-    def __init__(self, target):
+    def __init__(self, target, message=None, commit=True):
         super(GitTarget, self).__init__(target)
+        self._message = message
         self._workspace = None
+        self._commit = commit
 
     @property
     def workspace(self):
@@ -25,7 +27,12 @@ class GitTarget(TargetBase):
         """
         summary: a summary of the action performed on the target.
         """
-        message = "updating repo programatically (via surgen): \n\n" + str(summary)
+        if not self._commit:
+            self.log("committing disabled for {0}".format(self))
+            return
+
+        message = "{0}\n\n{1}".format(self._message or DEFAULT_MESSAGE, str(summary))
+
         try:
             self._repo.git.add(".")
             if self._repo.is_dirty():
