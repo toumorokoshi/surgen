@@ -8,11 +8,12 @@ LOG = logging.getLogger(__name__)
 DEFAULT_MESSAGE = "updating repo programatically (via surgen)"
 
 class GitTarget(TargetBase):
-    def __init__(self, target, message=None, commit=True):
+    def __init__(self, target, message=None, commit=True, branch=None):
         super(GitTarget, self).__init__(target)
         self._message = message
         self._workspace = None
         self._commit = commit
+        self._branch = branch
 
     @property
     def workspace(self):
@@ -38,7 +39,10 @@ class GitTarget(TargetBase):
             if self._repo.is_dirty():
                 self.log("committing changes to {0}".format(self._target))
                 self._repo.index.commit(message)
-                self._repo.git.push()
+                if self._branch:
+                    self._repo.git.push(self._repo.remotes[0].name, "{0}:{1}".format(self._repo.active_branch.name, self._branch))
+                else:
+                    self._repo.git.push()
             else:
                 self.log("no changes found. skipping commit...")
         except Exception as e:
