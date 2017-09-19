@@ -3,6 +3,7 @@ import shutil
 import tempfile
 from .base import TargetBase
 from git import Repo
+from git.exc import GitCommandError
 
 LOG = logging.getLogger(__name__)
 DEFAULT_MESSAGE = "updating repo programatically (via surgen)"
@@ -35,20 +36,29 @@ class GitTarget(TargetBase):
         message = "{0}\n\n{1}".format(self._message or DEFAULT_MESSAGE, str(summary))
 
         try:
-            self._repo.git.add(".")
-            if self._repo.is_dirty():
-                self.log("committing changes to {0}".format(self._target))
-                self._repo.index.commit(message)
-                if self._branch:
-                    self._repo.git.push(self._repo.remotes[0].name, "{0}:{1}".format(self._repo.active_branch.name, self._branch))
-                else:
-                    self._repo.git.push()
-            else:
-                self.log("no changes found. skipping commit...")
+            self._commit_and_push(self._repo, self._branch, self._message)
         except Exception as e:
             LOG.exception("")
             print(e)
             self.log("unable to push to {0}".format(self._target))
+
+    def _commit_and_push(self, repo, branch, message):
+        if repo.is_dirty():
+            self.log("committing changes to {0}".format(self._target))
+            repo.git.commit(all=True, message=message)
+        self._push(repo, branch)
+
+    def _push(self, repo, branch):
+        if branch:
+            # this typically means the remote doesn't have the branch to rebase against
+            try:
+                repo.git.pull(self._repo.remotes[0].name, branch, rebase=True)
+            except GitCommandError:
+                pass
+            repo.git.push(self._repo.remotes[0].name, "{0}:{1}".format(self._repo.active_branch.name, branch))
+        else:
+            repo.git.pull(rebase=True)
+            repo.git.push()
 
     def cleanup(self):
         shutil.rmtree(self._workspace)
