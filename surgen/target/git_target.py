@@ -45,6 +45,7 @@ class GitTarget(TargetBase):
     def _commit_and_push(self, repo, branch, message):
         if repo.is_dirty():
             self.log("committing changes to {0}".format(self._target))
+            repo.git.add(A=True)
             repo.git.commit(all=True, message=message)
         self._push(repo, branch)
 
