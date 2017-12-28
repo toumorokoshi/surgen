@@ -17,6 +17,7 @@ install_requires = [
     'clint',
     'docopt',
     'gitpython',
+    'py',
 ]
 
 tests_require = []
