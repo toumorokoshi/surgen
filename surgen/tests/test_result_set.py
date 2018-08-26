@@ -1,4 +1,4 @@
-from surgen.result_set import ResultStatus
+from surgen.results import ResultStatus
 
 
 def test_result_formatting():
