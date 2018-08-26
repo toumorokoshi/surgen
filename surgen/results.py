@@ -1,10 +1,6 @@
 import attr
 
-ResultStatus = {
-    "PASS": "PASS",
-    "FAIL": "FAIL",
-    "SKIP": "SKIP",
-}
+ResultStatus = {"PASS": "PASS", "FAIL": "FAIL", "SKIP": "SKIP"}
 
 
 @attr.s(frozen=True)
@@ -13,9 +9,7 @@ class Result(object):
     status = attr.ib()
 
     def __str__(self):
-        return "procedure: {0}, status: {1}".format(
-            self.procedure, self.status
-        )
+        return "procedure: {0}, status: {1}".format(self.procedure, self.status)
 
 
 class Results(list):

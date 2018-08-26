@@ -43,26 +43,39 @@ class Surgen(object):
             if not dry_run:
                 target.commit(results)
             self._print_results(results)
-            self._performed_procedure_data.append(
-                (target, results)
-            )
+            self._performed_procedure_data.append((target, results))
             return 1 if ResultStatus["FAIL"] in results else 0
         finally:
             target.cleanup()
 
     def _print_results(self, results):
-        puts(colored.green("Complete! {0} procedure(s) performed.".format(
-            len(self._procedures_by_name))))
-        puts(colored.green("{PASS} success, {FAIL} failed, {SKIP} skipped".format(
-            **results.count_by_status)))
+        puts(
+            colored.green(
+                "Complete! {0} procedure(s) performed.".format(
+                    len(self._procedures_by_name)
+                )
+            )
+        )
+        puts(
+            colored.green(
+                "{PASS} success, {FAIL} failed, {SKIP} skipped".format(
+                    **results.count_by_status
+                )
+            )
+        )
 
     def _run_procedure(self, name, procedure_cls, target_dir, dry_run):
         puts(colored.yellow("executing...".format(name)))
         procedure = procedure_cls(name, target_dir)
         should_not_run_reason = procedure.should_not_run()
         if should_not_run_reason:
-            puts(colored.yellow(
-                "skipping, should_not_run returned: {0}".format(should_not_run_reason)))
+            puts(
+                colored.yellow(
+                    "skipping, should_not_run returned: {0}".format(
+                        should_not_run_reason
+                    )
+                )
+            )
             return ResultStatus["SKIP"]
         if not dry_run:
             try:
@@ -70,8 +83,7 @@ class Surgen(object):
                     result = procedure.operate()
             except Exception as e:
                 LOG.debug("", exc_info=True)
-                puts(colored.red(
-                    "procedure raised an exception! {0}".format(e)))
+                puts(colored.red("procedure raised an exception! {0}".format(e)))
                 return ResultStatus["FAIL"]
             puts(colored.green("complete!"))
         return ResultStatus["PASS"]
@@ -79,8 +91,13 @@ class Surgen(object):
     def print_total_summary(self):
         """ print the total summary. """
         for target, results in self._performed_procedure_data:
-            puts(colored.green("{0}: {PASS} | {FAIL} | {SKIP}".format(
-                target, **results.count_by_status)))
+            puts(
+                colored.green(
+                    "{0}: {PASS} | {FAIL} | {SKIP}".format(
+                        target, **results.count_by_status
+                    )
+                )
+            )
 
 
 def surgen_from_directory(procedure_dir):
@@ -95,10 +112,13 @@ def _procedures_from_dir(procedure_dir):
             puts(colored.yellow("skipping {0}, it is a directory."))
             continue
         if not d.endswith(".py"):
-            puts(colored.yellow(
-                "skipping {0}, it does not end with extension .py".format(d)))
+            puts(
+                colored.yellow(
+                    "skipping {0}, it does not end with extension .py".format(d)
+                )
+            )
             continue
-        name = d[:-len(".py")]
+        name = d[: -len(".py")]
         full_path = os.path.join(procedure_dir, d)
         try:
             procedures_by_name[name] = from_file(full_path)

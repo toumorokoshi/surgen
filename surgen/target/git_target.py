@@ -8,6 +8,7 @@ from git.exc import GitCommandError
 LOG = logging.getLogger(__name__)
 DEFAULT_MESSAGE = "updating repo programatically (via surgen)"
 
+
 class GitTarget(TargetBase):
     def __init__(self, target, message=None, commit=True, branch=None):
         super(GitTarget, self).__init__(target)
@@ -56,7 +57,10 @@ class GitTarget(TargetBase):
                 repo.git.pull(self._repo.remotes[0].name, branch, rebase=True)
             except GitCommandError:
                 pass
-            repo.git.push(self._repo.remotes[0].name, "{0}:{1}".format(self._repo.active_branch.name, branch))
+            repo.git.push(
+                self._repo.remotes[0].name,
+                "{0}:{1}".format(self._repo.active_branch.name, branch),
+            )
         else:
             repo.git.pull(rebase=True)
             repo.git.push()

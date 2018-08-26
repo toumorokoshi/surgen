@@ -25,9 +25,13 @@ DEFAULT_DRIVER = "local"
 
 
 def main(argv=sys.argv[1:]):
-    options = docopt.docopt(__doc__,  argv=argv, options_first=True)
+    options = docopt.docopt(__doc__, argv=argv, options_first=True)
     level = logging.DEBUG if options["--verbose"] else logging.INFO
     s = surgen_from_directory(options.get("<procedure_dir>") or DEFAULT_PROCEDURE_DIR)
     d = options.get("--driver") or DEFAULT_DRIVER
-    t = target_from_str(d, options.get("<target>")) if options.get("<target>") else LocalTarget(DEFAULT_TARGET_DIR)
+    t = (
+        target_from_str(d, options.get("<target>"))
+        if options.get("<target>")
+        else LocalTarget(DEFAULT_TARGET_DIR)
+    )
     return s.operate(t, options["--ignore-errors"], options["--dry-run"])

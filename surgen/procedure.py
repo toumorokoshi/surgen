@@ -56,11 +56,13 @@ def from_string(string, file_name):
     exec(bytecode, l, l)
     for name, value in l.items():
         if (
-            isinstance(value, type) and
-            issubclass(value, Procedure) and
-            value is not Procedure
+            isinstance(value, type)
+            and issubclass(value, Procedure)
+            and value is not Procedure
         ):
             return value
-    raise ProcedureNotFound("unable to find class that inherits surgen.Procedure in file {0}".format(
-        file_name
-    ))
+    raise ProcedureNotFound(
+        "unable to find class that inherits surgen.Procedure in file {0}".format(
+            file_name
+        )
+    )

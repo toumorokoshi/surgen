@@ -27,23 +27,23 @@ def compare_procedure(procedure_file, inp, output):
     p.operate()
     _assert_identical_directories(output, tmp_dir)
 
+
 def _assert_identical_directories(l, r):
     for root, _, file_names in os.walk(l):
         for name in file_names:
-            relative_path = os.path.join(root, os.curdir + os.sep + name)[len(l):]
+            relative_path = os.path.join(root, os.curdir + os.sep + name)[len(l) :]
             # remove absolute at top, if it exists
             relative_path = relative_path.lstrip(os.sep)
             l_path = os.path.join(l, relative_path)
             r_path = os.path.join(r, relative_path)
             with open(l_path) as l_fh:
                 with open(r_path) as r_fh:
-                    result = list(difflib.ndiff(
-                        l_fh.read().splitlines(),
-                        r_fh.read().splitlines())
+                    result = list(
+                        difflib.ndiff(
+                            l_fh.read().splitlines(), r_fh.read().splitlines()
+                        )
                     )
-                    result = [r for r in result if not r.startswith(' ')]
+                    result = [r for r in result if not r.startswith(" ")]
                     if result:
                         pprint(result)
-                    assert not result, "contents of {} != {}.".format(
-                        l_path, r_path
-                    )
+                    assert not result, "contents of {} != {}.".format(l_path, r_path)
