@@ -18,6 +18,7 @@ import logging
 import sys
 from .surgen import Surgen, surgen_from_directory
 from .target import target_from_str, LocalTarget
+from .log import setup_logging
 
 DEFAULT_PROCEDURE_DIR = os.path.join(os.curdir, "surgen_procedures")
 DEFAULT_TARGET_DIR = os.curdir
@@ -27,6 +28,7 @@ DEFAULT_DRIVER = "local"
 def main(argv=sys.argv[1:]):
     options = docopt.docopt(__doc__, argv=argv, options_first=True)
     level = logging.DEBUG if options["--verbose"] else logging.INFO
+    setup_logging(level)
     s = surgen_from_directory(options.get("<procedure_dir>") or DEFAULT_PROCEDURE_DIR)
     d = options.get("--driver") or DEFAULT_DRIVER
     t = (

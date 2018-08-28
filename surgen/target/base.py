@@ -1,5 +1,5 @@
-from clint.textui import puts
-
+import logging
+LOG = logging.getLogger(__name__)
 
 class TargetBase(object):
     TARGET_TYPE = "base"
@@ -8,7 +8,7 @@ class TargetBase(object):
         self._target = target
 
     def log(self, msg):
-        puts(msg)
+        LOG.info(msg)
 
     @property
     def workspace(self):

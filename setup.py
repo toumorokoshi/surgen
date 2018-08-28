@@ -15,6 +15,7 @@ README_PATH = os.path.join(base, "README.rst")
 install_requires = [
     'attrs',
     'clint',
+    'coloredlogs',
     'docopt',
     'gitpython',
     'py',
