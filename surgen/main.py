@@ -1,15 +1,15 @@
 """surgen, a codebase upgrade tool
 
 Usage:
-  surgen [-d -i -v --driver=<driver> <procedure_dir> <target>]
+  surgen [-d -i -v --driver=<driver> --log=<level> <procedure_dir> <target>]
 
 Options:
   <procedure_dir>         the directory containing surgen procedure files [default: ./procedures/]
   <target>                the target to operate on. [default: .]
   --driver=<driver>       the target driver to use. [default: local]
+  --log=<level>           log at the specified log level. levels follow those in the verboselogs python library.
   -d, --dry-run           skips execution if provided
   -i, --ignore-errors     continues if a procedure fails
-  -v, --verbose           show verbose output
   -h, --help              show this usage guide
 """
 import os
@@ -27,7 +27,7 @@ DEFAULT_DRIVER = "local"
 
 def main(argv=sys.argv[1:]):
     options = docopt.docopt(__doc__, argv=argv, options_first=True)
-    level = logging.DEBUG if options["--verbose"] else logging.INFO
+    level = options.get("--log") or logging.INFO
     setup_logging(level)
     s = surgen_from_directory(options.get("<procedure_dir>") or DEFAULT_PROCEDURE_DIR)
     d = options.get("--driver") or DEFAULT_DRIVER

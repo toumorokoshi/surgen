@@ -45,12 +45,12 @@ class Surgen(object):
             target.cleanup()
 
     def _print_results(self, results):
-        LOG.info(
+        LOG.notice(
             "Complete! {0} procedure(s) performed.".format(
                 len(self._procedures_by_name)
             )
         )
-        LOG.info(
+        LOG.notice(
             "{PASS} success, {FAIL} failed, {SKIP} skipped".format(
                 **results.count_by_status
             )
@@ -59,9 +59,13 @@ class Surgen(object):
     def _run_procedure(self, name, procedure_cls, target_dir, dry_run):
         LOG.info("executing...".format(name))
         procedure = procedure_cls(name, target_dir)
-        should_not_run_reason = procedure.should_not_run()
+        try:
+            should_not_run_reason = procedure.should_not_run()
+        except Exception as e:
+            LOG.exception("procedure raised an exception during should_not_run! {0}".format(e))
+            return ResultStatus["FAIL"]
         if should_not_run_reason:
-            LOG.warn(
+            LOG.info(
                 "skipping, should_not_run returned: {0}".format(
                     should_not_run_reason
                 )
@@ -73,19 +77,20 @@ class Surgen(object):
             except Exception as e:
                 LOG.exception("procedure raised an exception! {0}".format(e))
                 return ResultStatus["FAIL"]
-            puts(colored.green("complete!"))
+            LOG.info("complete!")
         return ResultStatus["PASS"]
 
     def print_total_summary(self):
         """ print the total summary. """
         for target, results in self._performed_procedure_data:
-            puts(
-                colored.green(
-                    "{0}: {PASS} | {FAIL} | {SKIP}".format(
-                        target, **results.count_by_status
-                    )
-                )
-            )
+            level = logging.SUCCESS
+            if results.count_by_status["FAIL"] > 0:
+                level = logging.ERROR
+            if results.count_by_status["PASS"] == 0:
+                level = logging.NOTICE
+            LOG.log(level, "{0}: {PASS} | {FAIL} | {SKIP}".format(
+                target, **results.count_by_status
+            ))
 
 
 def surgen_from_directory(procedure_dir):
@@ -97,10 +102,10 @@ def _procedures_from_dir(procedure_dir):
     procedures_by_name = OrderedDict()
     for d in sorted(os.listdir(procedure_dir)):
         if os.path.isdir(d):
-            LOG.warn("skipping {0}, it is a directory.".format(d))
+            LOG.info("skipping {0}, it is a directory.".format(d))
             continue
         if not d.endswith(".py"):
-            LOG.warn("skipping {0}, it does not end with extension .py".format(d))
+            LOG.info("skipping {0}, it does not end with extension .py".format(d))
             continue
         name = d[: -len(".py")]
         full_path = os.path.join(procedure_dir, d)

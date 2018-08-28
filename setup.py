@@ -19,6 +19,7 @@ install_requires = [
     'docopt',
     'gitpython',
     'py',
+    'verboselogs',
 ]
 
 tests_require = []
