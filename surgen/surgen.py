@@ -37,7 +37,7 @@ class Surgen(object):
                     self._print_results(results)
                     return 1
             if not dry_run:
-                target.commit(results)
+                target.commit(results.short_summary())
             self._print_results(results)
             self._performed_procedure_data.append((target, results))
             return 1 if ResultStatus["FAIL"] in results else 0

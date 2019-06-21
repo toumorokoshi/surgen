@@ -10,7 +10,7 @@ DEFAULT_MESSAGE = "updating repo programatically (via surgen)"
 
 
 class GitTarget(TargetBase):
-    def __init__(self, target, message=None, commit=True, branch=None):
+    def __init__(self, target, message=None, commit=True, branch=None, author=None):
         super(GitTarget, self).__init__(target)
         self._message = message
         self._workspace = None
@@ -47,7 +47,8 @@ class GitTarget(TargetBase):
         if repo.is_dirty():
             self.log("committing changes to {0}".format(self._target))
             repo.git.add(A=True)
-            repo.git.commit(all=True, message=message)
+            import pdb; pdb.set_trace()
+            repo.git.commit(all=True, message=message, author="Yusuke Tsutsumi <yusuket@zillowgroup.com>", committer="Yusuke Tsutsumi <yusuket@zillowgroup.com>")
         self._push(repo, branch)
 
     def _push(self, repo, branch):

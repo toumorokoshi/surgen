@@ -31,3 +31,13 @@ class Results(list):
     @property
     def count_by_status(self):
         return self._by_status
+
+    def short_summary(self) -> str:
+        """ 
+        return a shortened summary that only
+        includes passed procedures
+        """
+        return "\n".join((
+            str(result) for result in self 
+            if result.status == "PASS"
+        ))
