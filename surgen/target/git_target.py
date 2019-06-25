@@ -44,7 +44,7 @@ class GitTarget(TargetBase):
             self.log("unable to push to {0}".format(self._target))
 
     def _commit_and_push(self, repo, branch, message):
-        if repo.is_dirty():
+        if repo.is_dirty(untracked_files=True):
             self.log("committing changes to {0}".format(self._target))
             repo.git.add(A=True)
             repo.git.commit(all=True, message=message)
