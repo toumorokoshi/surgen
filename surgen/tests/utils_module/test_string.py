@@ -31,4 +31,3 @@ def test_insert():
 def test_remove():
     contents = "and a one and a two and a"
     assert remove(["one"], contents) == "and a  and a two and a"
-

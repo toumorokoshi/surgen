@@ -62,13 +62,13 @@ class Surgen(object):
         try:
             should_not_run_reason = procedure.should_not_run()
         except Exception as e:
-            LOG.exception("procedure raised an exception during should_not_run! {0}".format(e))
+            LOG.exception(
+                "procedure raised an exception during should_not_run! {0}".format(e)
+            )
             return ResultStatus["FAIL"]
         if should_not_run_reason:
             LOG.info(
-                "skipping, should_not_run returned: {0}".format(
-                    should_not_run_reason
-                )
+                "skipping, should_not_run returned: {0}".format(should_not_run_reason)
             )
             return ResultStatus["SKIP"]
         if not dry_run:
@@ -88,9 +88,12 @@ class Surgen(object):
                 level = logging.ERROR
             if results.count_by_status["PASS"] == 0:
                 level = logging.NOTICE
-            LOG.log(level, "{0}: {PASS} | {FAIL} | {SKIP}".format(
-                target, **results.count_by_status
-            ))
+            LOG.log(
+                level,
+                "{0}: {PASS} | {FAIL} | {SKIP}".format(
+                    target, **results.count_by_status
+                ),
+            )
 
 
 def surgen_from_directory(procedure_dir):
