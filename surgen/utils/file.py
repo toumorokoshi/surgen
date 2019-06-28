@@ -1,12 +1,12 @@
 import os
-import py
+import typing
 
 
-def find(root_dir, name):
+def find(root_dir: str, name: str) -> typing.Optional[str]:
     """
     recurse through the desired directory, and return a py.path.local
     object that matches that name.
     """
     for root, _, file_names in os.walk(root_dir):
         if name in file_names:
-            return py.path.local(os.path.join(root, name))
+            return os.path.join(root, name)
