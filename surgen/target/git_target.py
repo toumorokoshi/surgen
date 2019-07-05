@@ -1,6 +1,7 @@
 import logging
 import shutil
 import tempfile
+from typing import Dict
 from .base import TargetBase
 from git import Repo
 from git.exc import GitCommandError
@@ -10,12 +11,28 @@ DEFAULT_MESSAGE = "updating repo programatically (via surgen)"
 
 
 class GitTarget(TargetBase):
-    def __init__(self, target, message=None, commit=True, branch=None):
+    """
+    Perform surgen operations against a git repository. The following
+    arguments can be passed:
+
+    * envvars: a dictionary of environment variables which will be used during git commands.
+          this enables customizability of values such as GIT_AUTHOR_NAME, GIT_COMMITTER_NAME, etc.
+    """
+
+    def __init__(
+        self,
+        target,
+        message=None,
+        commit=True,
+        branch=None,
+        envvars: Dict[str, str] = None,
+    ):
         super(GitTarget, self).__init__(target)
         self._message = message
         self._workspace = None
         self._commit = commit
         self._branch = branch
+        self._envvars = envvars or {}
 
     @property
     def workspace(self):
@@ -37,7 +54,7 @@ class GitTarget(TargetBase):
         message = "{0}\n\n{1}".format(self._message or DEFAULT_MESSAGE, str(summary))
 
         try:
-            self._commit_and_push(self._repo, self._branch, self._message)
+            self._commit_and_push(self._repo, self._branch, message)
         except Exception as e:
             LOG.exception("")
             print(e)
@@ -46,8 +63,9 @@ class GitTarget(TargetBase):
     def _commit_and_push(self, repo, branch, message):
         if repo.is_dirty(untracked_files=True):
             self.log("committing changes to {0}".format(self._target))
-            repo.git.add(A=True)
-            repo.git.commit(all=True, message=message)
+            with repo.git.custom_environment(**self._envvars):
+                repo.git.add(A=True)
+                repo.git.commit(all=True, message=message)
         self._push(repo, branch)
 
     def _push(self, repo, branch):

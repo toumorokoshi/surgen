@@ -24,6 +24,13 @@ class Results(list):
     def __str__(self):
         return "\n".join(list(str(e) for e in self))
 
+    def short_summary(self) -> str:
+        """
+        return a shortened summary that only
+        includes passed procedures
+        """
+        return "\n".join((str(result) for result in self if result.status == "PASS"))
+
     def add(self, result):
         super(Results, self).append(result)
         self._by_status[result.status] += 1
